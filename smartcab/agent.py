@@ -123,7 +123,7 @@ class LearningAgent(Agent):
             else:
                 maxQ = self.get_maxQ(state)
                 for act in self.Q[state]:
-                    if  self.Q[state][act] == maxQ:
+                    if self.Q[state][act] == maxQ:
                         action = act
                         break
 
@@ -140,7 +140,7 @@ class LearningAgent(Agent):
         ###########
         # When learning, implement the value iteration update rule
         #   Use only the learning rate 'alpha' (do not use the discount factor 'gamma')
-        self.Q[state][action] += reward*self.alpha
+        self.Q[state][action] = (1.0-self.alpha)*self.Q[state][action] + self.alpha*reward;
 
         return
 
@@ -192,7 +192,7 @@ def run():
     #   display      - set to False to disable the GUI if PyGame is enabled
     #   log_metrics  - set to True to log trial and simulation results to /logs
     #   optimized    - set to True to change the default log file name
-    sim = Simulator(env, update_delay=0.01, log_metrics=True)
+    sim = Simulator(env, update_delay=0.01, display=False, log_metrics=True)
 
     ##############
     # Run the simulator
