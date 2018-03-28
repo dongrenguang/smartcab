@@ -39,7 +39,7 @@ class LearningAgent(Agent):
         # Update epsilon using a decay function of your choice
         # Update additional class parameters as needed
         # If 'testing' is True, set epsilon and alpha to 0
-        self.epsilon = pow(0.96, self.t)
+        self.epsilon = pow(0.98, self.t)
         self.t += 1
         if testing:
             self.epsilon = 0.0
@@ -74,10 +74,7 @@ class LearningAgent(Agent):
         ## TO DO ##
         ###########
         # Calculate the maximum Q-value of all actions for a given state
-        maxQ = None
-        for value in self.Q[state].values():
-            if value > maxQ:
-                maxQ = value
+        maxQ = max(self.Q[state].values())
 
         return maxQ
 
@@ -91,10 +88,8 @@ class LearningAgent(Agent):
         # When learning, check if the 'state' is not in the Q-table
         # If it is not, create a new dictionary for that state
         #   Then, for each action available, set the initial Q-value to 0.0
-        if not self.Q.has_key(state):
-            self.Q[state] = dict()
-            for action in self.valid_actions:
-                self.Q[state][action] = 0.0
+        if self.learning:
+            self.Q.setdefault(state, {action: 0.0 for action in self.valid_actions})
 
         return
 
@@ -115,18 +110,17 @@ class LearningAgent(Agent):
         # When learning, choose a random action with 'epsilon' probability
         #   Otherwise, choose an action with the highest Q-value for the current state
         if not self.learning:
-            random_index = random.randint(0, len(self.valid_actions) - 1)
-            action = self.valid_actions[random_index]
+            action = random.choice(self.valid_actions)
         else:
             if random.random() <= self.epsilon:
-                random_index = random.randint(0, len(self.valid_actions) - 1)
-                action = self.valid_actions[random_index]
+                action = random.choice(self.valid_actions)
             else:
                 maxQ = self.get_maxQ(state)
+                actions = []
                 for act in self.Q[state]:
                     if self.Q[state][act] == maxQ:
-                        action = act
-                        break
+                        actions.append(act)
+                action = random.choice(actions)
 
         return action
 
@@ -200,7 +194,7 @@ def run():
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(n_test=10, tolerance=0.0002)
+    sim.run(n_test=10, tolerance=0.017)
 
 
 if __name__ == '__main__':
